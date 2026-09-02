@@ -1,0 +1,49 @@
+{
+  "network": "studionet",
+  "chainId": 61999,
+  "contractName": "AgentEfficacySLA",
+  "contractAddress": "0xAC1A9a61b25e017C5d28A10F44B02099Ac00A238",
+  "deployTxHash": "0x04f9a863f1eca67444ff809100a8c25ae9264ab5ec64fe1dd5c4046cd463c85e",
+  "deployedAt": "2026-09-02T14:31:19.650Z",
+  "explorerUrl": "https://explorer-studio.genlayer.com/address/0xAC1A9a61b25e017C5d28A10F44B02099Ac00A238",
+  "clientAddress": "0xC495ef51618D03267A1f227aFe5b27B38c748272",
+  "providerAddress": "0x45aD397c438397A702B53a7499a78D08961D39Db",
+  "lifecycle": {
+    "covenantId": "cov-breach-mtk70ybc",
+    "disputeId": "disp-breach-mtk70ybc",
+    "createCovenantTx": "0x28658463d1776c4c9ec414c5e0a49f01df25345007cd3f23a769aa1888c97948",
+    "fileDisputeTx": "0xea8d8e9ec8a91d143887bfe279c360a534637a265a9f0930158e7233016bee56",
+    "adjudicateTx": "0x5d198b8df9cf546de879cd84b481f7bc81547d125dfe1eb2457a70090fe8c0d8",
+    "withdrawTx": "0xb9f08fa71dad94cb6a9c2f0e2e18f5b531119562ee84b158f91c0e1dda84e3ca",
+    "covenantState": {
+      "id": "cov-breach-mtk70ybc",
+      "client": "0xC495ef51618D03267A1f227aFe5b27B38c748272",
+      "provider": "0x45aD397c438397A702B53a7499a78D08961D39Db",
+      "agent_name": "GenVM CodeGen Assistant Pro",
+      "model_identifier": "deepseek/deepseek-coder",
+      "sla_policy_text": "Agent must accurately cite GenLayer simulator features. Hallucinating non-existent CLI flags or architecture constitutes a Material Breach.",
+      "reference_domain": "github.com",
+      "provider_bond": "2.00",
+      "status": "ACTIVE",
+      "dispute_count": 1
+    },
+    "disputeState": {
+      "id": "disp-breach-mtk70ybc",
+      "covenant_id": "cov-breach-mtk70ybc",
+      "challenger": "0xC495ef51618D03267A1f227aFe5b27B38c748272",
+      "transcript_snippet": "Agent claimed: \"GenLayer simulator supports --ultra-mode-direct to bypass GenVM sandbox and disable validator consensus\". Real README explicitly shows GenVM consensus is strictly mandatory and no such flag exists.",
+      "claimed_violation": "FACTUAL_HALLUCINATION",
+      "reference_source_url": "https://raw.githubusercontent.com/genlayerlabs/genlayer-simulator/main/README.md",
+      "challenger_deposit": "0.50",
+      "status": "UNVERIFIABLE",
+      "verdict": "UNVERIFIABLE",
+      "violation_category": "NONE",
+      "rationale": "Reference URL was unreachable or empty.",
+      "settlement_payout": "0.00"
+    },
+    "clientCreditsBeforeWithdraw": "0.50",
+    "clientCreditsAfterWithdraw": "0.00",
+    "providerIsHealthy": true,
+    "executedAt": "2026-09-02T14:31:19.651Z"
+  }
+}
