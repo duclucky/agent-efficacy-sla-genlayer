@@ -3,6 +3,7 @@ import { EIP6963ProviderDetail } from '../types';
 
 interface WalletContextType {
   address: string | null;
+  provider: any | null;
   isConnected: boolean;
   selectedProviderName: string | null;
   availableProviders: EIP6963ProviderDetail[];
@@ -16,15 +17,16 @@ interface WalletContextType {
   closeAccountDrawer: () => void;
   connectWallet: (detail?: EIP6963ProviderDetail) => Promise<void>;
   disconnectWallet: () => void;
-  switchChain: () => Promise<void>;
+  switchChain: (providerInstance?: any) => Promise<void>;
 }
 
-const STUDIONET_CHAIN_ID = '0xf1ef'; // 61999 in hex
+const STUDIONET_CHAIN_ID = '0xf1ef'; // 61999 in hex (Studionet)
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [address, setAddress] = useState<string | null>(null);
+  const [provider, setProvider] = useState<any | null>(null);
   const [selectedProviderName, setSelectedProviderName] = useState<string | null>(null);
   const [availableProviders, setAvailableProviders] = useState<EIP6963ProviderDetail[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,8 +62,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const closeAccountDrawer = () => setIsAccountDrawerOpen(false);
 
   const switchChain = async (providerInstance?: any) => {
-    const p = providerInstance || (window as any).ethereum;
-    if (!p) return;
+    const p = providerInstance || provider || (typeof window !== 'undefined' ? (window as any).ethereum : null);
+    if (!p || typeof p.request !== 'function') return;
     try {
       await p.request({
         method: 'wallet_switchEthereumChain',
@@ -89,7 +91,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           });
           setChainId(STUDIONET_CHAIN_ID);
         } catch (addError) {
-          console.error('Failed to add Studionet chain:', addError);
+          console.error('Failed to add Studionet chain to wallet:', addError);
         }
       }
     }
@@ -98,37 +100,40 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const connectWallet = async (detail?: EIP6963ProviderDetail) => {
     setIsConnecting(true);
     try {
-      let provider = detail?.provider;
+      let selectedP = detail?.provider;
       let name = detail?.info?.name || 'Injected Wallet';
 
-      if (!provider && typeof window !== 'undefined' && (window as any).ethereum) {
-        provider = (window as any).ethereum;
+      if (!selectedP && typeof window !== 'undefined' && (window as any).ethereum) {
+        selectedP = (window as any).ethereum;
         name = 'Browser Injected (MetaMask/OKX/Rabby)';
       }
 
-      if (!provider) {
-        // Fallback demo account if no browser extension is detected
+      if (!selectedP) {
+        // Fallback demo account if no browser extension is present
         const demoAddr = '0x71C83637e127394E9684C558F2e68449D0d7b21e';
         setAddress(demoAddr);
-        setSelectedProviderName('Simulated Web3 Session');
+        setProvider(null);
+        setSelectedProviderName('Demo Session (No Injected Wallet)');
         setChainId(STUDIONET_CHAIN_ID);
         setIsModalOpen(false);
         setIsConnecting(false);
         return;
       }
 
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const accounts = await selectedP.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         setAddress(accounts[0]);
+        setProvider(selectedP);
         setSelectedProviderName(name);
-        await switchChain(provider);
+        await switchChain(selectedP);
       }
       setIsModalOpen(false);
     } catch (err: any) {
       console.warn('Wallet connection note:', err);
-      // Demo fallback on user rejection
+      // Demo session fallback
       setAddress('0x71C83637e127394E9684C558F2e68449D0d7b21e');
-      setSelectedProviderName('Demo Connected');
+      setProvider(null);
+      setSelectedProviderName('Demo Session');
       setChainId(STUDIONET_CHAIN_ID);
       setIsModalOpen(false);
     } finally {
@@ -138,6 +143,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const disconnectWallet = () => {
     setAddress(null);
+    setProvider(null);
     setSelectedProviderName(null);
     setIsAccountDrawerOpen(false);
   };
@@ -146,6 +152,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <WalletContext.Provider
       value={{
         address,
+        provider,
         isConnected: !!address,
         selectedProviderName,
         availableProviders,

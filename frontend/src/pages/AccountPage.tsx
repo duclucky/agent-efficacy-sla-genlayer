@@ -24,7 +24,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({
   covenants,
   onRefresh,
 }) => {
-  const { address, isConnected, openWalletModal } = useWallet();
+  const { address, provider, isConnected, openWalletModal } = useWallet();
   const [stats, setStats] = useState<AccountStats | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawMsg, setWithdrawMsg] = useState<string | null>(null);
@@ -38,10 +38,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({
 
   useEffect(() => {
     if (address) {
-      const adapter = new ContractAdapter(address);
+      const adapter = new ContractAdapter(address, provider);
       adapter.getAccountStats(address).then(setStats);
     }
-  }, [address]);
+  }, [address, provider]);
 
   const handleWithdraw = async () => {
     if (!address) return;
@@ -49,7 +49,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({
     setWithdrawMsg(null);
     setWithdrawError(null);
     try {
-      const adapter = new ContractAdapter(address);
+      const adapter = new ContractAdapter(address, provider);
       const res = await adapter.withdrawCredits();
       setWithdrawMsg(`Successfully withdrew ${res.amount} GEN to your wallet.`);
       adapter.getAccountStats(address).then(setStats);
@@ -71,7 +71,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({
         setDepositSuccess(`Deposited ${depositAmount} GEN bond collateral.`);
         setIsDepositing(false);
         if (address) {
-          const adapter = new ContractAdapter(address);
+          const adapter = new ContractAdapter(address, provider);
           adapter.getAccountStats(address).then(setStats);
         }
       }, 1200);

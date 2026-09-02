@@ -5,7 +5,7 @@ import { ContractAdapter } from '../services/contractAdapter';
 import { AccountStats } from '../types';
 
 export const AccountDrawer: React.FC = () => {
-  const { isAccountDrawerOpen, closeAccountDrawer, address, selectedProviderName, disconnectWallet } = useWallet();
+  const { isAccountDrawerOpen, closeAccountDrawer, address, provider, selectedProviderName, disconnectWallet } = useWallet();
   const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState<AccountStats | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -13,10 +13,10 @@ export const AccountDrawer: React.FC = () => {
 
   useEffect(() => {
     if (address && isAccountDrawerOpen) {
-      const adapter = new ContractAdapter(address);
+      const adapter = new ContractAdapter(address, provider);
       adapter.getAccountStats(address).then(setStats);
     }
-  }, [address, isAccountDrawerOpen]);
+  }, [address, provider, isAccountDrawerOpen]);
 
   if (!isAccountDrawerOpen || !address) return null;
 
@@ -30,7 +30,7 @@ export const AccountDrawer: React.FC = () => {
     setIsWithdrawing(true);
     setWithdrawMsg(null);
     try {
-      const adapter = new ContractAdapter(address);
+      const adapter = new ContractAdapter(address, provider);
       const res = await adapter.withdrawCredits();
       setWithdrawMsg(`Withdrew ${res.amount} GEN remediation credit.`);
       adapter.getAccountStats(address).then(setStats);

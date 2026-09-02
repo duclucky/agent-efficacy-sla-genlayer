@@ -29,7 +29,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
   onBack,
   onRefresh,
 }) => {
-  const { address, isConnected, openWalletModal } = useWallet();
+  const { address, provider, isConnected, openWalletModal } = useWallet();
   const [isAdjudicating, setIsAdjudicating] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
     setIsAdjudicating(true);
     setActionError(null);
     try {
-      const adapter = new ContractAdapter(address || '');
+      const adapter = new ContractAdapter(address || '', provider);
       await adapter.adjudicateDispute(dispute.id);
       onRefresh();
     } catch (err: any) {

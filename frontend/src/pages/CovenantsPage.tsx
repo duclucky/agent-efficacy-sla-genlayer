@@ -29,7 +29,7 @@ export const CovenantsPage: React.FC<CovenantsPageProps> = ({
   onRefresh,
   onNavigateToDispute,
 }) => {
-  const { address, isConnected, openWalletModal } = useWallet();
+  const { address, provider, isConnected, openWalletModal } = useWallet();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'ALL' | 'ACTIVE' | 'QUARANTINED'>('ALL');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -71,7 +71,7 @@ export const CovenantsPage: React.FC<CovenantsPageProps> = ({
     setIsSubmitting(true);
     setFormError(null);
     try {
-      const adapter = new ContractAdapter(address || '');
+      const adapter = new ContractAdapter(address || '', provider);
       const res = await adapter.createCovenant({
         agentName,
         modelIdentifier: modelIdentifier || 'custom/agent-v1',

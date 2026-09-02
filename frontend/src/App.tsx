@@ -13,7 +13,7 @@ import { Covenant, Dispute } from './types';
 import { useWallet } from './context/WalletContext';
 
 export const App: React.FC = () => {
-  const { address } = useWallet();
+  const { address, provider } = useWallet();
   const [activeTab, setActiveTab] = useState<string>('landing');
   const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null);
   const [initialDisputeCovenantId, setInitialDisputeCovenantId] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export const App: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const adapter = new ContractAdapter(address || '');
+      const adapter = new ContractAdapter(address || '', provider);
       const [covData, dispData] = await Promise.all([
         adapter.getCovenants(),
         adapter.getDisputes(),
@@ -37,7 +37,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [address]);
+  }, [address, provider]);
 
   const handleNavigate = (tab: string, disputeId?: string) => {
     if (disputeId) {

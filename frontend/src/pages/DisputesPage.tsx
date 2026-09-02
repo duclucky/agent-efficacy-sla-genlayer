@@ -10,6 +10,7 @@ import {
   AlertCircle,
   RefreshCw,
   X,
+  HelpCircle,
   Scale,
 } from 'lucide-react';
 import { Dispute, Covenant, ViolationCategory } from '../types';
@@ -31,7 +32,7 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
   onSelectDispute,
   initialCovenantId,
 }) => {
-  const { address, isConnected, openWalletModal } = useWallet();
+  const { address, provider, isConnected, openWalletModal } = useWallet();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [isModalOpen, setIsModalOpen] = useState(!!initialCovenantId);
@@ -47,10 +48,13 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
   const [successTx, setSuccessTx] = useState<string | null>(null);
 
   const filteredDisputes = disputes.filter((d) => {
+    const agent = d.agentName || '';
+    const transcript = d.transcriptSnippet || '';
+    const violation = d.claimedViolation || '';
     const matchesSearch =
-      d.agentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.transcriptSnippet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.claimedViolation.toLowerCase().includes(searchTerm.toLowerCase());
+      agent.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transcript.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      violation.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'ALL' || d.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -64,7 +68,7 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
     setIsSubmitting(true);
     setFormError(null);
     try {
-      const adapter = new ContractAdapter(address || '');
+      const adapter = new ContractAdapter(address || '', provider);
       const res = await adapter.fileDispute({
         covenantId: selectedCovenantId,
         transcriptSnippet,
@@ -100,6 +104,13 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
           <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent border border-accent/30 text-xs font-mono font-bold shadow-[0_0_8px_rgba(16,185,129,0.25)]">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>NO BREACH</span>
+          </span>
+        );
+      case 'UNVERIFIABLE':
+        return (
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-secondary text-muted-foreground border border-border text-xs font-mono font-bold">
+            <HelpCircle className="w-3.5 h-3.5 text-accent" />
+            <span>UNVERIFIABLE (REFUNDED)</span>
           </span>
         );
       case 'EVALUATING':
@@ -179,7 +190,7 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
         </div>
 
         <div className="flex items-center space-x-1.5 p-1.5 rounded-2xl bg-card border border-border overflow-x-auto">
-          {['ALL', 'OPEN', 'EVALUATING', 'BREACH_CONFIRMED', 'NO_BREACH'].map((status) => (
+          {['ALL', 'OPEN', 'EVALUATING', 'BREACH_CONFIRMED', 'NO_BREACH', 'UNVERIFIABLE'].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -197,57 +208,63 @@ export const DisputesPage: React.FC<DisputesPageProps> = ({
 
       {/* Disputes List */}
       <div className="space-y-4">
-        {filteredDisputes.map((dispute) => (
-          <div
-            key={dispute.id}
-            onClick={() => onSelectDispute(dispute.id)}
-            className="p-6 sm:p-7 rounded-3xl bg-card border border-border hover:border-accent/50 glass-card transition-all cursor-pointer group space-y-4 shadow-sm hover:shadow-glow-card"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center space-x-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-secondary border border-border flex items-center justify-center text-warning group-hover:scale-105 group-hover:border-warning/40 transition-all">
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-base text-foreground group-hover:text-accent transition-colors">
-                    {dispute.agentName}
-                  </h3>
-                  <div className="flex items-center space-x-2 text-xs text-muted-foreground font-mono mt-0.5">
-                    <span>Dispute ID: {dispute.id}</span>
-                    <span>•</span>
-                    <span className={`px-2 py-0.5 rounded-md border text-[11px] font-semibold ${getCategoryColor(dispute.claimedViolation)}`}>
-                      {dispute.claimedViolation}
-                    </span>
+        {filteredDisputes.length === 0 ? (
+          <div className="py-12 text-center text-muted-foreground text-sm font-mono p-8 rounded-3xl bg-card border border-border">
+            No disputes match the current filter.
+          </div>
+        ) : (
+          filteredDisputes.map((dispute) => (
+            <div
+              key={dispute.id}
+              onClick={() => onSelectDispute(dispute.id)}
+              className="p-6 sm:p-7 rounded-3xl bg-card border border-border hover:border-accent/50 glass-card transition-all cursor-pointer group space-y-4 shadow-sm hover:shadow-glow-card"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-secondary border border-border flex items-center justify-center text-warning group-hover:scale-105 group-hover:border-warning/40 transition-all">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-foreground group-hover:text-accent transition-colors">
+                      {dispute.agentName}
+                    </h3>
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground font-mono mt-0.5">
+                      <span>Dispute ID: {dispute.id}</span>
+                      <span>•</span>
+                      <span className={`px-2 py-0.5 rounded-md border text-[11px] font-semibold ${getCategoryColor(dispute.claimedViolation)}`}>
+                        {dispute.claimedViolation}
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                <div>{getStatusBadge(dispute.status)}</div>
               </div>
 
-              <div>{getStatusBadge(dispute.status)}</div>
-            </div>
-
-            {/* Transcript Snippet Box */}
-            <div className="p-4 rounded-2xl bg-background/90 border border-border/70 text-xs font-mono text-muted-foreground line-clamp-2 leading-relaxed">
-              <span className="text-accent font-bold">Transcript: </span>
-              {dispute.transcriptSnippet}
-            </div>
-
-            {/* Footer Metadata */}
-            <div className="pt-3 border-t border-border/50 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-muted-foreground font-mono gap-3">
-              <div className="flex flex-wrap items-center gap-4">
-                <span>Challenger: <strong className="text-foreground">{dispute.challenger.slice(0, 6)}...{dispute.challenger.slice(-4)}</strong></span>
-                <span>Deposit: <strong className="text-foreground">{dispute.challengerDeposit} GEN</strong></span>
-                {dispute.settlementPayout !== '0.0' && (
-                  <span>Payout: <strong className="text-destructive font-bold">-{dispute.settlementPayout} GEN Slashed</strong></span>
-                )}
+              {/* Transcript Snippet Box */}
+              <div className="p-4 rounded-2xl bg-background/90 border border-border/70 text-xs font-mono text-muted-foreground line-clamp-2 leading-relaxed">
+                <span className="text-accent font-bold">Transcript: </span>
+                {dispute.transcriptSnippet}
               </div>
 
-              <div className="flex items-center space-x-1.5 text-accent group-hover:translate-x-1 transition-transform font-bold text-xs">
-                <span>Inspect Consensus Details</span>
-                <ArrowRight className="w-4 h-4" />
+              {/* Footer Metadata */}
+              <div className="pt-3 border-t border-border/50 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-muted-foreground font-mono gap-3">
+                <div className="flex flex-wrap items-center gap-4">
+                  <span>Challenger: <strong className="text-foreground">{dispute.challenger.slice(0, 6)}...{dispute.challenger.slice(-4)}</strong></span>
+                  <span>Deposit: <strong className="text-foreground">{dispute.challengerDeposit} GEN</strong></span>
+                  {dispute.settlementPayout !== '0.0' && (
+                    <span>Payout: <strong className="text-destructive font-bold">-{dispute.settlementPayout} GEN Slashed</strong></span>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-1.5 text-accent group-hover:translate-x-1 transition-transform font-bold text-xs">
+                  <span>Inspect Consensus Details</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Modal: File SLA Dispute */}

@@ -96,27 +96,41 @@ let sessionCredits: Record<string, string> = {
 };
 
 export class ContractAdapter {
-  private client: any = null;
+  private readClient: any = null;
+  private walletClient: any = null;
   private userAddress: string = '';
+  private provider: any = null;
 
-  constructor(userAddress: string = '') {
+  constructor(userAddress: string = '', provider: any = null) {
     this.userAddress = userAddress;
+    this.provider = provider;
     try {
-      this.client = createClient({
+      this.readClient = createClient({
         chain: studionet,
-        account: userAddress ? (userAddress as `0x${string}`) : undefined,
       });
+
+      if (userAddress && userAddress.startsWith('0x') && this.provider) {
+        this.walletClient = createClient({
+          chain: studionet,
+          account: userAddress as `0x${string}`,
+          provider: this.provider,
+        });
+      }
     } catch (err) {
       console.warn('GenLayer client initialization note:', err);
     }
   }
 
+  getProvider(): any {
+    return this.provider;
+  }
+
   async getCovenants(): Promise<Covenant[]> {
-    if (!CONTRACT_ADDRESS || !this.client) {
+    if (!CONTRACT_ADDRESS || !this.readClient) {
       return sessionCovenants;
     }
     try {
-      const rawJson = await this.client.readContract({
+      const rawJson = await this.readClient.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'get_all_covenants',
         args: [],
@@ -135,11 +149,11 @@ export class ContractAdapter {
   }
 
   async getDisputes(): Promise<Dispute[]> {
-    if (!CONTRACT_ADDRESS || !this.client) {
+    if (!CONTRACT_ADDRESS || !this.readClient) {
       return sessionDisputes;
     }
     try {
-      const rawJson = await this.client.readContract({
+      const rawJson = await this.readClient.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'get_all_disputes',
         args: [],
@@ -167,12 +181,12 @@ export class ContractAdapter {
       disputesCount: sessionDisputes.filter(d => d.challenger.toLowerCase() === address.toLowerCase()).length,
     };
 
-    if (!CONTRACT_ADDRESS || !this.client || !address) {
+    if (!CONTRACT_ADDRESS || !this.readClient || !address || !address.startsWith('0x')) {
       return defaultStats;
     }
 
     try {
-      const credits = await this.client.readContract({
+      const credits = await this.readClient.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         functionName: 'get_credits',
         args: [address],
@@ -209,10 +223,11 @@ export class ContractAdapter {
       totalDisputesCount: 0,
     };
 
-    if (CONTRACT_ADDRESS && this.client && this.userAddress && this.userAddress.startsWith('0x')) {
+    const clientToUse = this.walletClient || this.readClient;
+    if (CONTRACT_ADDRESS && clientToUse && this.userAddress && this.userAddress.startsWith('0x')) {
       try {
         const bondWei = BigInt(Math.floor(parseFloat(params.bondAmountGEN || '2') * 1e18));
-        const txHash = await this.client.writeContract({
+        const txHash = await clientToUse.writeContract({
           account: this.userAddress as `0x${string}`,
           address: CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'create_covenant',
@@ -229,7 +244,7 @@ export class ContractAdapter {
         sessionCovenants.unshift(newCov);
         return { id: newId, txHash };
       } catch (err: any) {
-        console.warn('Contract write note, resolving in local session state:', err);
+        console.warn('Wallet transaction write note, updating session state:', err);
       }
     }
 
@@ -267,10 +282,11 @@ export class ContractAdapter {
       createdAt: Date.now(),
     };
 
-    if (CONTRACT_ADDRESS && this.client && this.userAddress && this.userAddress.startsWith('0x')) {
+    const clientToUse = this.walletClient || this.readClient;
+    if (CONTRACT_ADDRESS && clientToUse && this.userAddress && this.userAddress.startsWith('0x')) {
       try {
         const depositWei = BigInt(Math.floor(parseFloat(params.depositAmountGEN || '0.5') * 1e18));
-        const txHash = await this.client.writeContract({
+        const txHash = await clientToUse.writeContract({
           account: this.userAddress as `0x${string}`,
           address: CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'file_dispute',
@@ -286,7 +302,7 @@ export class ContractAdapter {
         sessionDisputes.unshift(newDispute);
         return { id: newId, txHash };
       } catch (err: any) {
-        console.warn('Contract file_dispute write note, resolving in session state:', err);
+        console.warn('Wallet transaction file_dispute note, updating session state:', err);
       }
     }
 
@@ -303,9 +319,10 @@ export class ContractAdapter {
       target.status = 'EVALUATING';
     }
 
-    if (CONTRACT_ADDRESS && this.client && this.userAddress && this.userAddress.startsWith('0x')) {
+    const clientToUse = this.walletClient || this.readClient;
+    if (CONTRACT_ADDRESS && clientToUse && this.userAddress && this.userAddress.startsWith('0x')) {
       try {
-        const txHash = await this.client.writeContract({
+        const txHash = await clientToUse.writeContract({
           account: this.userAddress as `0x${string}`,
           address: CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'adjudicate_dispute',
@@ -319,7 +336,7 @@ export class ContractAdapter {
         }
         return { verdict: 'BREACH_CONFIRMED', txHash };
       } catch (err: any) {
-        console.warn('Contract adjudicate write note, resolving in session state:', err);
+        console.warn('Wallet transaction adjudicate note, updating session state:', err);
       }
     }
 
@@ -343,9 +360,10 @@ export class ContractAdapter {
     const addr = this.userAddress || '0x71C83637e127394E9684C558F2e68449D0d7b21e';
     const amount = sessionCredits[addr] || '0.0';
 
-    if (CONTRACT_ADDRESS && this.client && this.userAddress && this.userAddress.startsWith('0x')) {
+    const clientToUse = this.walletClient || this.readClient;
+    if (CONTRACT_ADDRESS && clientToUse && this.userAddress && this.userAddress.startsWith('0x')) {
       try {
-        const txHash = await this.client.writeContract({
+        const txHash = await clientToUse.writeContract({
           account: this.userAddress as `0x${string}`,
           address: CONTRACT_ADDRESS as `0x${string}`,
           functionName: 'withdraw_credits',
@@ -354,7 +372,7 @@ export class ContractAdapter {
         sessionCredits[addr] = '0.0';
         return { amount, txHash };
       } catch (err: any) {
-        console.warn('Contract withdraw write note, updating session state:', err);
+        console.warn('Wallet transaction withdraw note, updating session state:', err);
       }
     }
 
