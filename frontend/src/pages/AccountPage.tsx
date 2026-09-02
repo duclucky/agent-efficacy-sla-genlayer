@@ -8,6 +8,7 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import { ContractAdapter } from '../services/contractAdapter';
@@ -81,17 +82,17 @@ export const AccountPage: React.FC<AccountPageProps> = ({
 
   if (!isConnected || !address) {
     return (
-      <div className="py-16 text-center space-y-4 max-w-md mx-auto animate-fadeIn">
-        <div className="w-14 h-14 rounded-2xl bg-secondary mx-auto flex items-center justify-center text-muted-foreground">
-          <Wallet className="w-7 h-7" />
+      <div className="py-20 text-center space-y-5 max-w-md mx-auto animate-fadeIn">
+        <div className="w-16 h-16 rounded-3xl bg-secondary/80 border border-border mx-auto flex items-center justify-center text-muted-foreground shadow-sm">
+          <Wallet className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">Connect Wallet to Manage Bonds & Credits</h2>
-        <p className="text-xs text-muted-foreground">
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground">Connect Wallet to Manage Bonds & Credits</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
           Connect your Web3 wallet on GenLayer Studionet to inspect your performance bonds and withdraw SLA remediation payouts.
         </p>
         <button
           onClick={openWalletModal}
-          className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-semibold cursor-pointer shadow-glow-accent"
+          className="px-6 py-3 rounded-2xl bg-accent hover:bg-accent-hover text-accent-foreground text-xs sm:text-sm font-bold cursor-pointer shadow-glow-accent hover:scale-[1.02] transition-all"
         >
           Connect Wallet
         </button>
@@ -100,21 +101,21 @@ export const AccountPage: React.FC<AccountPageProps> = ({
   }
 
   return (
-    <div className="space-y-8 animate-fadeIn pb-16">
+    <div className="space-y-8 animate-fadeIn pb-20 max-w-5xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight gradient-heading">
+      <div className="pb-2 border-b border-border/60">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight gradient-heading font-sans">
           Account Bonds & SLA Credits
         </h1>
-        <p className="text-sm text-muted-foreground font-mono">
-          Settlement Ledger & Collateral Management for {address.slice(0, 6)}...{address.slice(-4)}
+        <p className="text-xs sm:text-sm text-muted-foreground font-mono mt-1">
+          Settlement Ledger & Collateral Management for <span className="text-foreground font-bold">{address.slice(0, 8)}...{address.slice(-6)}</span>
         </p>
       </div>
 
       {/* Main KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="p-6 rounded-3xl bg-card border border-border space-y-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="p-7 rounded-3xl bg-card border border-border/80 glass-card space-y-2.5 shadow-sm">
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider font-mono">
             Studionet Native Balance
           </span>
           <div className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono">
@@ -123,9 +124,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({
           <p className="text-[11px] text-muted-foreground font-mono">Used for gas and challenge deposits</p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-card border border-accent/40 shadow-glow-accent space-y-2">
-          <span className="text-xs font-semibold text-accent uppercase tracking-wider">
-            Claimable SLA Remediation Credits
+        <div className="p-7 rounded-3xl bg-card border border-accent/40 glass-card shadow-glow-accent space-y-2.5">
+          <span className="text-[11px] font-bold text-accent uppercase tracking-wider font-mono flex items-center space-x-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Claimable SLA Remediation</span>
           </span>
           <div className="text-2xl sm:text-3xl font-extrabold text-accent font-mono">
             {stats?.claimableCredits || '0.0'} GEN
@@ -133,9 +135,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({
           <p className="text-[11px] text-muted-foreground font-mono">From confirmed provider breach slashings</p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-card border border-border space-y-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Active Provider Bonds Locked
+        <div className="p-7 rounded-3xl bg-card border border-border/80 glass-card space-y-2.5 shadow-sm">
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider font-mono">
+            Active Provider Bonds
           </span>
           <div className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono">
             {stats?.bondsLocked || '2.0'} GEN
@@ -147,10 +149,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({
       {/* Two Column Section: Withdraw Credits vs Deposit Bond */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Withdraw Payouts */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-5">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center text-accent">
-              <Award className="w-5 h-5" />
+        <div className="p-7 sm:p-9 rounded-3xl bg-card border border-border space-y-6 shadow-sm">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/30 flex items-center justify-center text-accent">
+              <Award className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-bold text-foreground text-base">Withdraw SLA Remediation Credits</h3>
@@ -163,14 +165,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({
           </p>
 
           {withdrawMsg && (
-            <div className="p-3 rounded-xl bg-accent/15 border border-accent/30 text-xs text-accent flex items-center space-x-2 font-mono">
+            <div className="p-4 rounded-2xl bg-accent/15 border border-accent/30 text-xs text-accent flex items-center space-x-2 font-mono">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{withdrawMsg}</span>
             </div>
           )}
 
           {withdrawError && (
-            <div className="p-3 rounded-xl bg-destructive/15 border border-destructive/40 text-xs text-destructive flex items-center space-x-2 font-mono">
+            <div className="p-4 rounded-2xl bg-destructive/15 border border-destructive/40 text-xs text-destructive flex items-center space-x-2 font-mono">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{withdrawError}</span>
             </div>
@@ -179,10 +181,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({
           <button
             onClick={handleWithdraw}
             disabled={isWithdrawing || parseFloat(stats?.claimableCredits || '0') <= 0}
-            className={`w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+            className={`w-full py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all cursor-pointer ${
               parseFloat(stats?.claimableCredits || '0') > 0
-                ? 'bg-accent hover:bg-accent-hover text-accent-foreground shadow-glow-accent'
-                : 'bg-secondary text-muted-foreground cursor-not-allowed'
+                ? 'bg-accent hover:bg-accent-hover text-accent-foreground shadow-glow-accent hover:scale-[1.02]'
+                : 'bg-secondary text-muted-foreground cursor-not-allowed border border-border'
             }`}
           >
             {isWithdrawing ? (
@@ -199,10 +201,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({
         </div>
 
         {/* Right Column: Provider Collateral Management */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-5">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-accent">
-              <Lock className="w-5 h-5" />
+        <div className="p-7 sm:p-9 rounded-3xl bg-card border border-border space-y-6 shadow-sm">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-secondary border border-border flex items-center justify-center text-accent">
+              <Lock className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-bold text-foreground text-base">Deposit Provider Performance Bond</h3>
@@ -212,20 +214,20 @@ export const AccountPage: React.FC<AccountPageProps> = ({
 
           <form onSubmit={handleDepositBond} className="space-y-4">
             {depositSuccess && (
-              <div className="p-3 rounded-xl bg-accent/15 border border-accent/30 text-xs text-accent flex items-center space-x-2 font-mono">
+              <div className="p-4 rounded-2xl bg-accent/15 border border-accent/30 text-xs text-accent flex items-center space-x-2 font-mono">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{depositSuccess}</span>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 font-mono">
                 Target Covenant
               </label>
               <select
                 value={selectedCovenantId}
                 onChange={(e) => setSelectedCovenantId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border focus:border-accent text-sm text-foreground focus:outline-none font-mono"
+                className="w-full px-4 py-3 rounded-2xl bg-background border border-border focus:border-accent text-sm text-foreground focus:outline-none font-mono"
               >
                 {covenants.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -236,21 +238,21 @@ export const AccountPage: React.FC<AccountPageProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 font-mono">
                 Deposit Bond Amount (GEN)
               </label>
               <input
                 type="text"
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border focus:border-accent text-sm text-foreground focus:outline-none font-mono"
+                className="w-full px-4 py-3 rounded-2xl bg-background border border-border focus:border-accent text-sm text-foreground focus:outline-none font-mono"
               />
             </div>
 
             <button
               type="submit"
               disabled={isDepositing}
-              className="w-full py-3 px-4 rounded-xl bg-secondary hover:bg-secondary/80 border border-border hover:border-accent/40 text-foreground font-semibold text-sm flex items-center justify-center space-x-2 transition-all cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border hover:border-accent/40 text-foreground font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all cursor-pointer hover:scale-[1.02]"
             >
               {isDepositing ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />

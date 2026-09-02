@@ -54,51 +54,51 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
   const isFinalized = dispute.status === 'BREACH_CONFIRMED' || dispute.status === 'NO_BREACH' || dispute.status === 'SETTLED';
 
   return (
-    <div className="space-y-8 animate-fadeIn pb-16">
+    <div className="space-y-8 animate-fadeIn pb-20 max-w-5xl mx-auto">
       {/* Back navigation */}
       <button
         onClick={onBack}
-        className="flex items-center space-x-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        className="flex items-center space-x-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors cursor-pointer group"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span>Back to All Disputes</span>
       </button>
 
-      {/* Main Title & Status Header */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-6">
+      {/* Main Title & Status Hero */}
+      <div className="p-7 sm:p-9 rounded-[2rem] bg-card border border-border space-y-6 shadow-glow-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/60">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-warning/15 border border-warning/40 flex items-center justify-center text-warning shadow-glow-warning">
-              <ShieldAlert className="w-6 h-6" />
+          <div className="flex items-center space-x-4">
+            <div className="w-14 h-14 rounded-2xl bg-warning/15 border border-warning/40 flex items-center justify-center text-warning shadow-glow-warning">
+              <ShieldAlert className="w-7 h-7" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground">{dispute.agentName}</h1>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary text-accent font-mono font-bold">
+              <div className="flex items-center space-x-2.5">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground">{dispute.agentName}</h1>
+                <span className="text-xs px-3 py-1 rounded-full bg-secondary text-accent font-mono font-bold border border-border">
                   {dispute.id}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                Covenant Target: {dispute.covenantId} • Category: <strong className="text-warning">{dispute.claimedViolation}</strong>
+              <p className="text-xs text-muted-foreground font-mono mt-1">
+                Target Covenant: {dispute.covenantId} • Violation: <strong className="text-warning">{dispute.claimedViolation}</strong>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div>
             {dispute.status === 'BREACH_CONFIRMED' && (
-              <span className="px-3.5 py-1.5 rounded-full bg-destructive/15 text-destructive border border-destructive/40 text-xs font-mono font-bold flex items-center space-x-1.5 shadow-glow-destructive">
+              <span className="px-4 py-2 rounded-2xl bg-destructive/15 text-destructive border border-destructive/40 text-xs font-mono font-bold flex items-center space-x-2 shadow-glow-destructive">
                 <XCircle className="w-4 h-4" />
                 <span>BREACH CONFIRMED & SLASHED</span>
               </span>
             )}
             {dispute.status === 'NO_BREACH' && (
-              <span className="px-3.5 py-1.5 rounded-full bg-accent/15 text-accent border border-accent/40 text-xs font-mono font-bold flex items-center space-x-1.5 shadow-glow-accent">
+              <span className="px-4 py-2 rounded-2xl bg-accent/15 text-accent border border-accent/40 text-xs font-mono font-bold flex items-center space-x-2 shadow-glow-accent">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>VERIFIED CONFORMANT (NO BREACH)</span>
               </span>
             )}
             {(dispute.status === 'OPEN' || dispute.status === 'EVALUATING') && (
-              <span className="px-3.5 py-1.5 rounded-full bg-warning/15 text-warning border border-warning/40 text-xs font-mono font-bold flex items-center space-x-1.5 animate-pulse shadow-glow-warning">
+              <span className="px-4 py-2 rounded-2xl bg-warning/15 text-warning border border-warning/40 text-xs font-mono font-bold flex items-center space-x-2 animate-pulse shadow-glow-warning">
                 <Clock className="w-4 h-4" />
                 <span>AWAITING VALIDATOR CONSENSUS</span>
               </span>
@@ -108,39 +108,40 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
 
         {/* 4-Stage Validator Consensus Progress Tracker */}
         <div className="space-y-3">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Consensus Verification Pipeline
+          <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">
+            <span>GenLayer Consensus Execution Pipeline</span>
+            <span className="text-accent">{isFinalized ? '4 / 4 Completed' : 'In Progress'}</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-            <div className="p-3 rounded-xl bg-accent/10 border border-accent/30 text-accent flex items-center space-x-2">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs font-mono">
+            <div className="p-3.5 rounded-2xl bg-accent/10 border border-accent/30 text-accent flex items-center space-x-2.5 shadow-sm">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>1. Dispute Filed</span>
             </div>
             <div
-              className={`p-3 rounded-xl border flex items-center space-x-2 ${
+              className={`p-3.5 rounded-2xl border flex items-center space-x-2.5 transition-all ${
                 isFinalized
                   ? 'bg-accent/10 border-accent/30 text-accent'
-                  : 'bg-warning/10 border-warning/30 text-warning animate-pulse'
+                  : 'bg-warning/15 border-warning/40 text-warning animate-pulse shadow-glow-warning'
               }`}
             >
               <Globe className="w-4 h-4 shrink-0" />
               <span>2. Fetch HTTPS Truth</span>
             </div>
             <div
-              className={`p-3 rounded-xl border flex items-center space-x-2 ${
+              className={`p-3.5 rounded-2xl border flex items-center space-x-2.5 transition-all ${
                 isFinalized
                   ? 'bg-accent/10 border-accent/30 text-accent'
-                  : 'bg-secondary text-muted-foreground border-border'
+                  : 'bg-secondary/60 text-muted-foreground border-border'
               }`}
             >
               <Scale className="w-4 h-4 shrink-0" />
               <span>3. GenVM Equivalence</span>
             </div>
             <div
-              className={`p-3 rounded-xl border flex items-center space-x-2 ${
+              className={`p-3.5 rounded-2xl border flex items-center space-x-2.5 transition-all ${
                 isFinalized
-                  ? 'bg-destructive/10 border-destructive/30 text-destructive'
-                  : 'bg-secondary text-muted-foreground border-border'
+                  ? 'bg-destructive/15 border-destructive/40 text-destructive shadow-glow-destructive'
+                  : 'bg-secondary/60 text-muted-foreground border-border'
               }`}
             >
               <Award className="w-4 h-4 shrink-0" />
@@ -150,26 +151,26 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
         </div>
       </div>
 
-      {/* Main Grid: Transcript Evidence & Ground Truth */}
+      {/* Main Evidence Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Submitted Transcript Snippet */}
-        <div className="p-6 rounded-3xl bg-card border border-border space-y-4">
+        {/* Left: Transcript Box */}
+        <div className="p-7 rounded-3xl bg-card border border-border space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-foreground text-sm flex items-center space-x-2">
               <Cpu className="w-4 h-4 text-accent" />
-              <span>Agent Interaction Session Transcript</span>
+              <span>Interaction Session Transcript</span>
             </h3>
-            <span className="text-[11px] text-muted-foreground font-mono">Submitted by Challenger</span>
+            <span className="text-[11px] text-muted-foreground font-mono">Challenger Submitted</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-background border border-border/80 font-mono text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+          <div className="p-4 rounded-2xl bg-background border border-border/80 font-mono text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
             {dispute.transcriptSnippet}
           </div>
 
-          <div className="pt-2 text-xs text-muted-foreground space-y-1 font-mono">
+          <div className="pt-2 text-xs text-muted-foreground space-y-1.5 font-mono bg-secondary/30 p-3 rounded-2xl border border-border/40">
             <div className="flex justify-between">
               <span>Challenger Address:</span>
-              <span className="text-foreground">{dispute.challenger}</span>
+              <span className="text-foreground">{dispute.challenger.slice(0, 10)}...{dispute.challenger.slice(-6)}</span>
             </div>
             <div className="flex justify-between">
               <span>Challenger Deposit:</span>
@@ -178,8 +179,8 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Authoritative Reference Source & Validator Findings */}
-        <div className="p-6 rounded-3xl bg-card border border-border space-y-4">
+        {/* Right: Reference Source & Findings */}
+        <div className="p-7 rounded-3xl bg-card border border-border space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-foreground text-sm flex items-center space-x-2">
               <Globe className="w-4 h-4 text-accent" />
@@ -201,7 +202,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
           </div>
 
           <div className="p-4 rounded-2xl bg-secondary/40 border border-border/80 space-y-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block font-mono">
               Validator Consensus Finding
             </span>
             <p className="text-xs text-foreground leading-relaxed font-sans">
@@ -213,7 +214,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
           {!isFinalized && (
             <div className="pt-2">
               {actionError && (
-                <div className="mb-3 p-3 rounded-xl bg-destructive/15 border border-destructive/40 text-xs text-destructive flex items-center space-x-2">
+                <div className="mb-3 p-3 rounded-2xl bg-destructive/15 border border-destructive/40 text-xs text-destructive flex items-center space-x-2">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span>{actionError}</span>
                 </div>
@@ -221,7 +222,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
               <button
                 onClick={handleTriggerAdjudication}
                 disabled={isAdjudicating}
-                className="w-full py-3 px-4 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-glow-accent cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-2xl bg-accent hover:bg-accent-hover text-accent-foreground font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all shadow-glow-accent cursor-pointer hover:scale-[1.02]"
               >
                 {isAdjudicating ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -237,10 +238,10 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
 
       {/* Settlement Consequence Card */}
       {isFinalized && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-destructive/40 shadow-glow-destructive space-y-4">
+        <div className="p-7 sm:p-9 rounded-[2rem] bg-card border border-destructive/40 shadow-glow-destructive space-y-5">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-destructive/15 border border-destructive/30 flex items-center justify-center text-destructive">
-              <Award className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-2xl bg-destructive/15 border border-destructive/30 flex items-center justify-center text-destructive">
+              <Award className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-bold text-foreground text-base">Enforced Consequence & Settlement</h3>
@@ -249,22 +250,22 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-            <div className="p-4 rounded-2xl bg-background border border-border">
+            <div className="p-5 rounded-2xl bg-background border border-border">
               <span className="text-muted-foreground">Provider Bond Slashed</span>
-              <div className="text-lg font-bold text-destructive mt-1">-{dispute.settlementPayout} GEN</div>
+              <div className="text-xl font-extrabold text-destructive mt-1.5">-{dispute.settlementPayout} GEN</div>
             </div>
-            <div className="p-4 rounded-2xl bg-background border border-border">
+            <div className="p-5 rounded-2xl bg-background border border-border">
               <span className="text-muted-foreground">Client SLA Credit</span>
-              <div className="text-lg font-bold text-accent mt-1">+{dispute.settlementPayout} GEN</div>
+              <div className="text-xl font-extrabold text-accent mt-1.5">+{dispute.settlementPayout} GEN</div>
             </div>
-            <div className="p-4 rounded-2xl bg-background border border-border">
+            <div className="p-5 rounded-2xl bg-background border border-border">
               <span className="text-muted-foreground">Agent Provider State</span>
-              <div className="text-lg font-bold text-destructive mt-1">QUARANTINED</div>
+              <div className="text-xl font-extrabold text-destructive mt-1.5">QUARANTINED</div>
             </div>
           </div>
 
           {dispute.txHash && (
-            <div className="pt-2 text-xs text-muted-foreground font-mono flex items-center justify-between">
+            <div className="pt-3 border-t border-border/60 text-xs text-muted-foreground font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <span>Settlement Tx Hash:</span>
               <a
                 href={`https://explorer-studio.genlayer.com/tx/${dispute.txHash}`}
@@ -272,7 +273,7 @@ export const DisputeDetailPage: React.FC<DisputeDetailPageProps> = ({
                 rel="noopener noreferrer"
                 className="text-accent hover:underline flex items-center space-x-1"
               >
-                <span>{dispute.txHash.slice(0, 16)}...{dispute.txHash.slice(-8)}</span>
+                <span>{dispute.txHash.slice(0, 18)}...{dispute.txHash.slice(-8)}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

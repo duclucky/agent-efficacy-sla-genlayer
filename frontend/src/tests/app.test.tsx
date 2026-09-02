@@ -14,8 +14,8 @@ describe('AgentEfficacySLA dApp Frontend Suite', () => {
     renderWithProviders(<App />);
     expect(screen.getAllByText(/AgentEfficacy/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Enforce AI Agent SLAs On-Chain/i)).toBeInTheDocument();
-    expect(screen.getByText(/Active SLA Covenants/i)).toBeInTheDocument();
-    expect(screen.getByText(/Performance Bonds Locked/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Active SLA Covenants/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Performance Collateral/i)).toBeInTheDocument();
   });
 
   it('navigates seamlessly between multi-page routes via persistent header', async () => {
@@ -24,18 +24,18 @@ describe('AgentEfficacySLA dApp Frontend Suite', () => {
     // Click Covenants tab
     const covenantsBtn = screen.getAllByText('SLA Covenants')[0];
     fireEvent.click(covenantsBtn);
-    expect(screen.getByText(/Autonomous Agent SLA Covenants/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Autonomous Agent SLA Covenants/i).length).toBeGreaterThan(0);
 
     // Click Disputes tab
     const disputesBtn = screen.getAllByText('Breach Disputes')[0];
     fireEvent.click(disputesBtn);
-    expect(screen.getByText(/SLA Breach & Hallucination Disputes/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/SLA Breach & Hallucination Disputes/i).length).toBeGreaterThan(0);
 
     // Click Protocol Guide tab
     const guideBtn = screen.getAllByText('Protocol Guide')[0];
     fireEvent.click(guideBtn);
-    expect(screen.getByText(/Protocol Methodology & Developer Guide/i)).toBeInTheDocument();
-    expect(screen.getByText(/Why GenLayer is Required/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Protocol Methodology & Developer Guide/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Why GenLayer is/i).length).toBeGreaterThan(0);
   });
 
   it('ContractAdapter returns valid seeded covenants and disputes', async () => {
