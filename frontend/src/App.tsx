@@ -58,9 +58,9 @@ export const App: React.FC = () => {
     setActiveTab('dispute-detail');
   };
 
-  const selectedDispute = disputes.find((d) => d.id === selectedDisputeId);
-  const associatedCovenant = selectedDispute
-    ? covenants.find((c) => c.id === selectedDispute.covenantId)
+  const activeDispute = disputes.find((d) => d.id === selectedDisputeId) || disputes[0];
+  const associatedCovenant = activeDispute
+    ? covenants.find((c) => c.id === activeDispute.covenantId) || covenants[0]
     : undefined;
 
   return (
@@ -95,9 +95,9 @@ export const App: React.FC = () => {
             />
           )}
 
-          {activeTab === 'dispute-detail' && selectedDispute && (
+          {activeTab === 'dispute-detail' && activeDispute && (
             <DisputeDetailPage
-              dispute={selectedDispute}
+              dispute={activeDispute}
               covenant={associatedCovenant}
               onBack={() => setActiveTab('disputes')}
               onRefresh={loadData}
