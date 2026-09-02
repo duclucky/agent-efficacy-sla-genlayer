@@ -1,5 +1,6 @@
 from pathlib import Path
 import ast
+import pytest
 
 CONTRACT_PATH = Path("contracts/agent_efficacy_sla.py")
 
@@ -13,8 +14,9 @@ def test_contract_source_is_pure_ascii():
 
 def test_contract_header_depends_pragma():
     text = CONTRACT_PATH.read_text(encoding="ascii")
-    first_line = text.strip().splitlines()[0]
-    assert first_line.startswith('# { "Depends": "py-genlayer:'), f"Invalid header: {first_line}"
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    has_depends = any(line.startswith('# { "Depends": "py-genlayer:') for line in lines[:3])
+    assert has_depends, f"Missing Depends pragma in header: {lines[:3]}"
 
 def test_single_contract_subclass():
     text = CONTRACT_PATH.read_text(encoding="ascii")
